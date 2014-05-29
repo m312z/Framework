@@ -1,14 +1,12 @@
-
 package core.game;
 
 import network.Client;
 import network.packet.Packet;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
 
-import sound.SoundManager;
 import core.Frame;
+import core.Frame.GameState;
 import core.controller.PlayerController;
 
 public class ClientGame extends Game {
@@ -24,6 +22,22 @@ public class ClientGame extends Game {
 		super(frame);
 	}
 	
+	@Override
+	public void finish() {
+		finished = true;
+		clientConnection.disconnect();
+	}
+	
+	@Override
+	public void cancel() {
+		frame.state = GameState.MAINMENU;
+		finish();
+	}
+	
+	/*-------*/
+	/* setup */
+	/*-------*/
+	
 	/**
 	 * Set's up client game.  Uses <code>Client</code> to attempt a connection
 	 * and retrieves game details from the server.
@@ -31,66 +45,41 @@ public class ClientGame extends Game {
 	 * @param ip Host's IP address as a String.
 	 * @return	true if a game was successfully joined.
 	 */
-	public boolean setup(String password, String ip) {
+	public boolean setupClient(String password, String ip) {
 		clientConnection = new Client(password,ip,frame.getPlayer());
 		boolean success = clientConnection.isSuccessfulConnection();
 		return success;
 	}
-	
-	public void finish() {
-		finished = true;
-		clientConnection.disconnect();
-	}
-	
+		
 	public Client getClientConnection() {
 		return clientConnection;
 	}
 	
+	/*-----------*/
+	/* main loop */
+	/*-----------*/
+	
 	@Override
-	public void start() {
-			
-		lastFPS = getTime();
-		lastTick = getTime();
-		float dt = 1f;			
+	protected void setupLoop() {
+		
+		// setup FPS counter in Game
+		super.setupLoop();
 		
 		board.setTime(clientConnection.getStartTime());
 		syncBoard.setTime(clientConnection.getStartTime());
-		
-		while(!finished) {
-
-			// update FPS info
-			dt = (getTime() - lastTick) / GAMESPEED;
-			lastTick = getTime();
-			
-			// get input
-			pollInput();
-			processTasks();
-
-			// update model
-			finished = ( finished || board.tick(dt) );
-			
-			// draw
-			gui.draw(board, frame.getPlayer(), dt);
-			menuOverlay.draw();
-			updateFPS();
-			
-			// OpenGL update
-			Display.update();
-			Display.sync(60);
-						
-			// queue buffers
-			SoundManager.update();
-			
-			if(Display.isCloseRequested())
-				finished = true;
-			
-			if(!clientConnection.isSuccessfulConnection())
-				finished = true;
-		}
-		clientConnection.disconnect();
 	}
 	
+	@Override
 	protected void pollInput() {
+		
+		super.pollInput();
+		
+		if(!clientConnection.isSuccessfulConnection())
+			finished = true;
+	}
+	
+	@Override
+	protected void collectTasks() {
 		
 		// escape
 		if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE))
@@ -101,6 +90,7 @@ public class ClientGame extends Game {
 			controller.pollInput(board, menuOverlay);
 			for(Packet p: controller.getCommands()) {
 				tasks.put(p.getTime(),p);
+				
 				// send task to server
 				clientConnection.sendMessage(p);
 			}

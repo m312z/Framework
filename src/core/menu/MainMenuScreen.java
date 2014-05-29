@@ -1,8 +1,6 @@
 package core.menu;
 
-import static core.Frame.FULLSCREEN;
 import static core.Frame.SCREEN_SIZE;
-import static core.Frame.WINDOW_SIZE;
 import gui.FontManager.FontType;
 import gui.Pallete;
 import gui.ui.ButtonElement;
@@ -13,8 +11,6 @@ import gui.ui.TextElement;
 import java.awt.Color;
 import java.util.List;
 
-import org.lwjgl.opengl.Display;
-
 import phys.Point2D;
 import phys.Shape;
 import core.Frame;
@@ -24,17 +20,14 @@ import core.Frame.GameState;
  * Main menu controller.
  * @author Michael Cashmore
  */
-public class MainMenuScreen extends SetupScreen {
-
-	/* GUI */
-	HudOverlay menuOverlay;
+public class MainMenuScreen extends Screen {
 		
 	public MainMenuScreen(Frame frame) {
 		super(frame);
-		makeOverlay();
 	}
 	
-	private void makeOverlay() {
+	@Override
+	protected void makeOverlay() {
 		
 		// create menu UI
 		menuOverlay = new HudOverlay();
@@ -46,9 +39,13 @@ public class MainMenuScreen extends SetupScreen {
 				new Point2D(-hs*2, hs/2)
 		});
 		
-		ButtonElement startButton = new ButtonElement("start_button", bs, new Point2D(SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2 - 2*hs), Color.BLACK, Pallete.dull, Color.WHITE);
+		ButtonElement startButton = new ButtonElement("start_button", bs, new Point2D(SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2 - 3*hs), Color.BLACK, Pallete.dull, Color.WHITE);
 		startButton.addCommand(InteractionType.MOUSE_DOWN, "start");
 		startButton.addElement(new TextElement("sbt", bs, new Point2D(0,0), "PLAY", FontType.FONT_32));
+		
+		ButtonElement hostButton = new ButtonElement("host_button", bs, new Point2D(SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2 - 2*hs), Color.BLACK, Pallete.dull, Color.WHITE);
+		hostButton.addCommand(InteractionType.MOUSE_DOWN, "host");
+		hostButton.addElement(new TextElement("hbt", bs, new Point2D(0,0), "HOST", FontType.FONT_32));
 		
 		ButtonElement joinButton = new ButtonElement("join_button", bs, new Point2D(SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2 - hs), Color.BLACK, Pallete.dull, Color.WHITE);
 		joinButton.addCommand(InteractionType.MOUSE_DOWN, "join");
@@ -63,45 +60,21 @@ public class MainMenuScreen extends SetupScreen {
 		quitButton.addElement(new TextElement("qbt", bs,new Point2D(), "QUIT", FontType.FONT_32));
 		
 		menuOverlay.addElement(startButton);
+		menuOverlay.addElement(hostButton);
 		menuOverlay.addElement(joinButton);
 		menuOverlay.addElement(optionsButton);
 		menuOverlay.addElement(quitButton);
 	}
 
-	public void start() {
-				
-		finished = false;
-		
-		while(!finished) {
-
-			// pollInput
-			pollInput();
-						
-			// draw view
-			frame.getBackground().draw();
-			menuOverlay.draw();
-			
-			// opengl update
-			Display.update();
-			Display.sync(60);
-			if (Display.wasResized()) {
-	            frame.setDisplayMode(
-	            		Display.getWidth(),
-	            		Display.getHeight(),
-	            		Frame.FULLSCREEN);
-	            makeOverlay();
-			}
-						
-			if(Display.isCloseRequested())
-				finish();
-		}
-	}
-
-	private void pollInput() {
+	protected void pollInput() {
 		List<String> commands = menuOverlay.pollInput();
 		for(String com: commands) {
 			switch(com) {
 			case "start":
+				frame.state = GameState.LOCAL_GAME;
+				finished = true;
+				break;
+			case "host":
 				frame.state = GameState.HOST_GAME;
 				finished = true;
 				break;
@@ -110,11 +83,11 @@ public class MainMenuScreen extends SetupScreen {
 				finished = true;
 				break;
 			case "options":
-				frame.state = GameState.SETUP;
+				frame.state = GameState.OPTIONS;
 				finished = true;
 				break;
 			case "quit":
-				finish();
+				cancel();
 				break;
 			}
 		}
@@ -122,19 +95,12 @@ public class MainMenuScreen extends SetupScreen {
 		
 	@Override
 	public void cancel() {
-		frame.state = GameState.MAINMENU;
+		frame.state = GameState.END;
 		finished = true;
 	}
 	
 	@Override
 	public void finish() {
-		frame.state = GameState.END;
 		finished = true;
-	}
-	
-	public void fullScreen() {
-		FULLSCREEN = FULLSCREEN^true;
-		frame.setDisplayMode(WINDOW_SIZE[0], WINDOW_SIZE[1], FULLSCREEN);
-		makeOverlay();
 	}
 }

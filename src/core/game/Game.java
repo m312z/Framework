@@ -1,6 +1,5 @@
 package core.game;
 
-import static core.Frame.SCREEN_SIZE;
 import gui.GameGUI;
 import gui.ui.HudOverlay;
 
@@ -14,9 +13,11 @@ import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
-import sound.SoundManager;
 import core.Frame;
+import core.Frame.GameState;
+import core.controller.MouseController;
 import core.controller.PlayerController;
+import core.menu.Screen;
 
 /**
  * The main loop for the game.  Also contains some static fields
@@ -24,30 +25,24 @@ import core.controller.PlayerController;
  * @author Michael Cashmore
  *
  */
-public class Game {
+public class Game extends Screen {
 	
+	/* game loop statics */
 	public static final float INTERVAL_FRAMES = 180;
 	public static float GAMESPEED = 1f;
 	public static int randomSeed = 1;
 	public static Random randomGenerator;
-	
-	/* parent */
-	Frame frame;
-	
-	/* game over */
-	public boolean finished = false;
-	
+		
 	/* GUI */
 	protected GameGUI gui;
-	protected HudOverlay menuOverlay;
 	long lastFPS = 0;
 	int fps;
+	float dt;
 	
 	/* model */
 	protected Board board;
 	long lastTick;
 
-	
 	/* players playerID <-> Controller */
 	TreeMap<String,PlayerController> controllers;
 	
@@ -61,8 +56,33 @@ public class Game {
 	protected TreeMap<Float,Packet> syncTasks;
 	
 	public Game(Frame frame) {
-		this.frame = frame;		
+		super(frame);		
 		setup();
+	}
+	
+	@Override
+	public void cancel() {
+		frame.state = GameState.MAINMENU;
+		finished = true;
+	}
+	
+	/*-------*/
+	/* SETUP */
+	/*-------*/
+	
+	@Override
+	protected void makeOverlay() {
+		menuOverlay = new HudOverlay();
+//		switch(frame.getPlayer().getPlayerType()) {
+//		case BUILDER:
+//			controllers.put(frame.getPlayer().getPlayerID(), new BuilderController(frame.getPlayer().getPlayerID()));
+//			GameGUI.VIEW_SIZE[0] = 120;
+//			break;
+//		case SOLDIER:
+//			controllers.put(frame.getPlayer().getPlayerID(), new SoldierController(frame.getPlayer().getPlayerID()));
+//			GameGUI.VIEW_SIZE[0] = 160;
+//			break;
+//		}
 	}
 
 	public void setup() {
@@ -74,82 +94,43 @@ public class Game {
 		syncBoard = board.clone();
 		syncTasks = new TreeMap<Float, Packet>();
 		
-		// setup controllers / GUI
+		// setup controllers
 		controllers = new TreeMap<String,PlayerController>();
-//		switch(frame.getPlayer().getPlayerType()) {
-//			case BUILDER:
-//				controllers.put(frame.getPlayer().getPlayerID(), new BuilderController(frame.getPlayer().getPlayerID()));
-//				GameGUI.VIEW_SIZE[0] = 120;
-//				break;
-//			case SOLDIER:
-//				controllers.put(frame.getPlayer().getPlayerID(), new SoldierController(frame.getPlayer().getPlayerID()));
-//				GameGUI.VIEW_SIZE[0] = 160;
-//				break;
-//		}
-		
+		controllers.put(
+				frame.getPlayer().getPlayerID(),
+				new MouseController(frame.getPlayer().getPlayerID()));
 		// setup GUI / HUD
-		gui = new GameGUI();
-		float scale = (SCREEN_SIZE[0]/GameGUI.VIEW_SIZE[0]);
-		GameGUI.VIEW_SIZE[1] = SCREEN_SIZE[1]/scale;
-		GameGUI.offX = (GameGUI.VIEW_SIZE[0]/2 - Board.BOARD_SIZE[0]/2) * scale;
-		GameGUI.offY = (GameGUI.VIEW_SIZE[1]/2 - Board.BOARD_SIZE[1]/2) * scale;
-		menuOverlay = new HudOverlay(); // HudFactory.makeHUD(frame.getPlayer().getPlayerType());
-	}
-	
-	public Board getBoard() {
-		return board;
-	}
-	
-	public void addTask(Packet p) {
-		tasks.put(p.getTime(), p);
-	}
-	
-	public TreeMap<String, PlayerController> getControllers() {
-		return controllers;
+		gui = new GameGUI();		
 	}
 	
 	/*-----------*/
 	/* Main loop */
 	/*-----------*/
-	 
-	public void start() {
-
+	
+	@Override
+	protected void setupLoop() {
 		lastFPS = getTime();
 		lastTick = getTime();
-		float dt = 1f;		
+		dt = 1f;
+	};
+	
+	@Override
+	protected void pollInput() {
 		
-		while(!finished) {
-
-			// update FPS info
-			dt = (getTime() - lastTick) / GAMESPEED;
-						
-			lastTick = getTime();
-			
-			// get input
-			pollInput();
-			processTasks();
-
-			// update model
-			finished = ( finished || board.tick(dt) );
-			
-			// draw
-			gui.draw(board, frame.getPlayer(), dt);
-			menuOverlay.draw();
-			updateFPS();
-			
-			// OpenGL update
-			Display.update();
-			Display.sync(60);
-						
-			// queue buffers
-			SoundManager.update();
-			
-			if(Display.isCloseRequested())
-				finished = true;
-		}
+		// update FPS info
+		dt = (getTime() - lastTick) / GAMESPEED;
+		lastTick = getTime();
+		
+		// process game tasks
+		collectTasks();
+		processTasks();
+		
+		// update model
+		finished = ( finished || board.tick(dt) );
 	}
 
-	protected void pollInput() {
+	protected void collectTasks() {
+		
 		// escape
 		if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE))
 			finished = true;
@@ -163,7 +144,19 @@ public class Game {
 			controller.getCommands().clear();
 		}
 	}
+	
+	@Override
+	protected void drawScreen() {
+		// draw
+		gui.draw(board, frame.getPlayer(), dt);
+		menuOverlay.draw();
+		updateFPS();
+	}
 
+	/*--------------*/
+	/* Model update */
+	/*--------------*/
+	
 	/**
 	 * Process tasks in the order they were received.  Keep a clone of the game set
 	 * INTERVAL_FRAMES in the past to account for lag issues.
@@ -222,6 +215,10 @@ public class Game {
 		board = syncBoard;
 		syncBoard = newSyncBoard;
 	}
+
+	public void addTask(Packet p) {
+		tasks.put(p.getTime(), p);
+	}
 	
 	/**
 	 * @param threshold a time value.
@@ -243,6 +240,18 @@ public class Game {
 	 */
 	private boolean hasTasks() {
 		return (tasks.size()>0);
+	}
+	
+	/*---------------------*/
+	/* Setters and Getters */
+	/*---------------------*/
+	
+	public Board getBoard() {
+		return board;
+	}
+		
+	public TreeMap<String, PlayerController> getControllers() {
+		return controllers;
 	}
 	
 	protected void updateFPS() {

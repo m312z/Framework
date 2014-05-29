@@ -58,8 +58,8 @@ public class Frame {
 	public enum GameState {
 		LOADING,
 		MAINMENU,
-		SETUP,
-		LOBBY,
+		OPTIONS,
+		LOCAL_GAME,
 		HOST_GAME,
 		CLIENT_GAME,
 		RESULTS,
@@ -119,7 +119,7 @@ public class Frame {
 					done = (state==GameState.END);
 					break;
 										
-				case SETUP:
+				case OPTIONS:
 
 					/*-------*/
 					/* SETUP */
@@ -135,9 +135,10 @@ public class Frame {
 					/* HOST GAME */
 					/*-----------*/
 					Game.setSeed((int)Game.getTime());
+					player = new Player("host_player");
 					HostGame hostGame = new HostGame(this);
 					HostLobbySetup hlobby = new HostLobbySetup(this, hostGame.getServer());
-					hlobby.hostLobbyStart();
+					hlobby.start();
 					if(hlobby.toPlay()) {
 						/* PLAY GAME */
 						hostGame.start();
@@ -159,11 +160,11 @@ public class Frame {
 						// attempt connection
 						player = new Player(csetup.getName());
 						ClientGame clientGame = new ClientGame(this);
-						if(clientGame.setup(csetup.getPass(),csetup.getIP())) {
+						if(clientGame.setupClient(csetup.getPass(),csetup.getIP())) {
 							/* Joined game  */ 
 							clientGame.setup();
 							ClientLobbySetup clobby = new ClientLobbySetup(this, clientGame.getClientConnection());
-							clobby.clientLobbyStart();
+							clobby.start();
 							if(clobby.toPlay()) {
 								/* PLAY GAME */
 								clientGame.start();

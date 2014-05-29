@@ -8,8 +8,8 @@ public class XboxController extends core.controller.PlayerController {
 
 	net.java.games.input.Controller controller;
 	
-	public XboxController(String player, int playerID, net.java.games.input.Controller controller) {
-		super(player, playerID);
+	public XboxController(String playerID, net.java.games.input.Controller controller) {
+		super(playerID);
 		this.controller = controller;
 	}
 

@@ -13,27 +13,25 @@ import java.util.List;
 
 import network.Server;
 import network.packet.Packet;
-
-import org.lwjgl.opengl.Display;
-
 import phys.Point2D;
 import phys.Shape;
 import core.Frame;
 
-public class HostLobbySetup extends SetupScreen {
+public class HostLobbySetup extends Screen {
 
 	/* network connection */
 	Server connection;
 	
 	/* true if the game is starting */
 	boolean play = false;
-	
-	/* GUI */
-	HudOverlay menuOverlay;
 		
 	public HostLobbySetup(Frame frame, Server server) {
 		super(frame);
 		this.connection = server;
+	}
+	
+	@Override
+	protected void makeOverlay() {
 		menuOverlay = new HudOverlay();
 		float hs = SCREEN_SIZE[1]/10;
 		Shape bs = new Shape(new Point2D[] {
@@ -74,30 +72,9 @@ public class HostLobbySetup extends SetupScreen {
 //		return s;
 //	}
 
-	public void hostLobbyStart() {
+	@Override
+	protected void pollInput() {
 		
-		while(!finished) {
-
-			// pollInput
-			pollInput();
-			
-			// messages
-			getMessages();
-			
-			// draw view
-			frame.getBackground().draw();
-			menuOverlay.draw();
-			
-			// opengl update
-			Display.update();
-			Display.sync(60);
-						
-			if(Display.isCloseRequested())
-				finished = true;
-		}
-	}
-
-	private void pollInput() {
 		List<String> commands = menuOverlay.pollInput();
 		for(String com: commands) {
 			switch(com) {
@@ -105,6 +82,9 @@ public class HostLobbySetup extends SetupScreen {
 			case "quit": cancel(); break;
 			}
 		}
+
+		// messages
+		getMessages();
 	}
 	
 	private void getMessages() {

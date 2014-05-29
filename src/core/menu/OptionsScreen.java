@@ -13,8 +13,6 @@ import gui.ui.TextElement;
 import java.awt.Color;
 import java.util.List;
 
-import org.lwjgl.opengl.Display;
-
 import phys.Point2D;
 import phys.Shape;
 import sound.SoundManager;
@@ -25,17 +23,15 @@ import core.Frame.GameState;
  * Main menu controller.
  * @author Michael Cashmore
  */
-public class OptionsScreen extends SetupScreen {
-
-	/* GUI */
-	HudOverlay menuOverlay;
+public class OptionsScreen extends Screen {
 		
 	public OptionsScreen(Frame frame) {
 		super(frame);
 		makeOverlay();
 	}
 	
-	private void makeOverlay() {
+	@Override
+	protected void makeOverlay() {
 		
 		// create menu UI
 		menuOverlay = new HudOverlay();
@@ -76,36 +72,7 @@ public class OptionsScreen extends SetupScreen {
 		menuOverlay.getElement("sbt_off",menuOverlay.getElement("sound_button")).setVisible(!SoundManager.isSoundPlaying());
 	}
 
-	public void start() {
-				
-		finished = false;
-		
-		while(!finished) {
-
-			// pollInput
-			pollInput();
-						
-			// draw view
-			frame.getBackground().draw();
-			menuOverlay.draw();
-			
-			// opengl update
-			Display.update();
-			Display.sync(60);
-			if (Display.wasResized()) {
-	            frame.setDisplayMode(
-	            		Display.getWidth(),
-	            		Display.getHeight(),
-	            		Frame.FULLSCREEN);
-	            makeOverlay();
-			}
-						
-			if(Display.isCloseRequested())
-				finish();
-		}
-	}
-
-	private void pollInput() {
+	protected void pollInput() {
 		List<String> commands = menuOverlay.pollInput();
 		for(String com: commands) {
 			switch(com) {
@@ -127,13 +94,13 @@ public class OptionsScreen extends SetupScreen {
 		
 	@Override
 	public void cancel() {
-		frame.state = GameState.MAINMENU;
+		frame.state = GameState.END;
 		finished = true;
 	}
 	
 	@Override
 	public void finish() {
-		frame.state = GameState.END;
+		frame.state = GameState.MAINMENU;
 		finished = true;
 	}
 	

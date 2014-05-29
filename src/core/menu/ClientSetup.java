@@ -12,13 +12,11 @@ import gui.ui.TextEntryElement;
 import java.awt.Color;
 import java.util.List;
 
-import org.lwjgl.opengl.Display;
-
 import phys.Point2D;
 import phys.Shape;
 import core.Frame;
 
-public class ClientSetup extends SetupScreen {
+public class ClientSetup extends Screen {
 
 	/* true if to connect */
 	boolean join = false;
@@ -29,13 +27,17 @@ public class ClientSetup extends SetupScreen {
 	String pass;
 	
 	/* GUI */
-	HudOverlay menuOverlay;
 	TextEntryElement nameEntry;
 	TextEntryElement addEntry;
 	TextEntryElement passEntry;
 	
 	public ClientSetup(Frame frame) {
 		super(frame);
+	}
+	
+	@Override
+	protected void makeOverlay() {
+		
 		menuOverlay = new HudOverlay();
 		float hs = SCREEN_SIZE[1]/16;
 		Shape ps = new Shape(new Point2D[] {
@@ -77,26 +79,8 @@ public class ClientSetup extends SetupScreen {
 		((TextEntryElement)menuOverlay.getElement("address_entry")).setText("127.0.0.1");
 	}
 	
-	public void start() {
-		
-		while(!finished) {
-						
-			pollInput();
-						
-			// draw view
-			frame.getBackground().draw();
-			menuOverlay.draw();
-			
-			// opengl update
-			Display.update();
-			Display.sync(60);
-						
-			if(Display.isCloseRequested())
-				finished = true;
-		}
-	}
 
-	private void pollInput() {
+	protected void pollInput() {
 		List<String> commands = menuOverlay.pollInput();
 		for(String com: commands) {
 			switch(com) {

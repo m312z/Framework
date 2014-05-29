@@ -10,10 +10,9 @@ import network.packet.Packet;
 import network.packet.StartGamePacket;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
 
-import sound.SoundManager;
 import core.Frame;
+import core.Frame.GameState;
 import core.controller.PlayerController;
 
 
@@ -32,14 +31,33 @@ public class HostGame extends Game implements WindowListener {
 	public HostGame(Frame frame) {
 		super(frame);
 		// set up server
-		reset();
+		resetServer();
+	}
+	
+	@Override
+	public void finish() {
+		server.finish();
+		server.disconnectAll();
+		
+		if(displayServerFrame) {
+			serverFrame.setVisible(false);
+			serverFrame.dispose();
+		}
+		
+		finished = true;
+	}
+	
+	@Override
+	public void cancel() {
+		frame.state = GameState.MAINMENU;
+		finish();
 	}
 	
 	/*--------------*/
-	/* setup server */
+	/* Setup server */
 	/*--------------*/
 
-	private void reset() {
+	private void resetServer() {
 		
 		// display debug info pane
 		if(displayServerFrame) {
@@ -50,79 +68,29 @@ public class HostGame extends Game implements WindowListener {
 		
 		// create connection
 		server = new Server(gameName,serverFrame);
-		
-		// create game controller
-//		serverController = new GameServerController(this, server, board);
-		
 		if(displayServerFrame)
 			serverFrame.output("GameServer started: "+gameName);
-	}
-
-	public void finish() {
-		server.finish();
-		server.disconnectAll();
-		
-		if(displayServerFrame) {
-			serverFrame.setVisible(false);
-			serverFrame.dispose();
-		}
 	}
 	
 	public Server getServer() {
 		return server;
 	}
-	
+		
 	/*-----------*/
 	/* main loop */
 	/*-----------*/
 
 	@Override
-	public void start() {
+	protected void setupLoop() {
 		
-		lastFPS = getTime();
-		lastTick = getTime();
-		float dt = 1f;		
-		
-		server.sendMessageToAll(new StartGamePacket());
-		
-		while(!finished) {
-			
-			// update FPS info
-			dt = (getTime() - lastTick) / GAMESPEED;
-			lastTick = getTime();
-			
-			// get input
-			pollInput();
-			processTasks();
+		// setup FPS counter in Game
+		super.setupLoop();
 
-			// update model
-			finished = ( finished || board.tick(dt) );
-			
-			// draw
-			gui.draw(board, frame.getPlayer(), dt);
-			menuOverlay.draw();
-			updateFPS();
-			
-			// OpenGL update
-			Display.update();
-			Display.sync(60);
-						
-			// queue buffers
-			SoundManager.update();
-			
-			if(Display.isCloseRequested())
-				finished = true;
-		}
-		server.finish();
-		server.disconnectAll();
-		
-		if(displayServerFrame) {
-			serverFrame.setVisible(false);
-			serverFrame.dispose();
-		}
+		server.sendMessageToAll(new StartGamePacket());
 	}
-		
-	protected void pollInput() {
+	
+	@Override
+	protected void collectTasks() {
 		
 		// escape
 		if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE))

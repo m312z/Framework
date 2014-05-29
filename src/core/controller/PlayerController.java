@@ -10,29 +10,23 @@ import phys.Point2D;
 
 public abstract class PlayerController {
 
-	String player;
-	int playerID;
+	String playerID;
 
-	protected Point2D cursorPosition; 
+	protected Point2D cursorPosition;
 	protected List<Packet> commands;
 	
-	public PlayerController(String player, int playerID) {
-		this.player = player;
+	public PlayerController(String playerID) {
 		this.playerID = playerID;
 		this.cursorPosition = new Point2D();
 		this.commands = new ArrayList<Packet>(2);
 	}
-
-	public String getPlayer() {
-		return player;
-	}
 	
-	public int getPlayerID() {
+	public String getPlayerID() {
 		return playerID;
 	}
 	
-	public void setPlayer(String player) {
-		this.player = player;
+	public void setPlayer(String playerID) {
+		this.playerID = playerID;
 	}
 		
 	public Point2D getCursorPosition() {

@@ -9,8 +9,8 @@ import core.Frame;
 
 public class MouseController extends PlayerController {
 
-	public MouseController(String player, int playerID) {
-		super(player,playerID);
+	public MouseController(String playerID) {
+		super(playerID);
 	}
 		
 	@Override

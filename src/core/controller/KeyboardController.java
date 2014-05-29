@@ -6,8 +6,8 @@ import core.Frame;
 
 public class KeyboardController extends PlayerController {
 
-	public KeyboardController(String player, int playerID) {
-		super(player, playerID);
+	public KeyboardController(String playerID) {
+		super(playerID);
 	}
 
 	@Override

@@ -21,8 +21,8 @@ public class PlayerInputPacket extends Packet {
 		offset += 4;
 		
 		// name
-		name = controller.getPlayer();
-		b = ByteConversions.String32toByteArray(controller.getPlayer());
+		name = controller.getPlayerID();
+		b = ByteConversions.String32toByteArray(controller.getPlayerID());
 		for(int i=0;i<64;i++) rawData[i+offset] = b[i];
 		offset += 64;
 		

@@ -10,9 +10,6 @@ import gui.ui.TextElement;
 import java.awt.Color;
 import java.util.List;
 
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-
 import phys.Point2D;
 import phys.Shape;
 import core.Frame;
@@ -22,24 +19,15 @@ import core.Frame.GameState;
  * Main menu controller.
  * @author Michael Cashmore
  */
-public class ResultsScreen extends SetupScreen {
-
-	/* GUI */
-	HudOverlay menuOverlay;
-	
-	Point2D[] cursorPosition = new Point2D[] {
-			new Point2D(Frame.SCREEN_SIZE[0]/3f,Frame.SCREEN_SIZE[1]/2f),
-			new Point2D(Frame.SCREEN_SIZE[0]*2/3f,Frame.SCREEN_SIZE[1]/2f)
-	};
-	
-	boolean hotDown[] = {false, false};
+public class ResultsScreen extends Screen {
 	
 	public ResultsScreen(Frame frame) {
 		super(frame);	
 		makeOverlay();
 	}
 	
-	private void makeOverlay() {
+	@Override
+	protected void makeOverlay() {
 		
 		// create menu UI
 		menuOverlay = new HudOverlay();
@@ -68,39 +56,7 @@ public class ResultsScreen extends SetupScreen {
 		menuOverlay.addElement(backButton);
 	}
 
-	public void start() {
-		
-		Mouse.setGrabbed(true);
-		finished = false;
-		
-		while(!finished) {
-
-			// pollInput
-			pollInput();
-						
-			// draw view
-			frame.getBackground().draw();
-			menuOverlay.draw();
-			
-			// opengl update
-			Display.update();
-			Display.sync(60);
-			if (Display.wasResized()) {
-	            frame.setDisplayMode(
-	            		Display.getWidth(),
-	            		Display.getHeight(),
-	            		Frame.FULLSCREEN);
-	            makeOverlay();
-			}
-			
-			if(Display.isCloseRequested())
-				finished = true;
-		}
-		
-		Mouse.setGrabbed(false);
-	}
-
-	private void pollInput() {
+	protected void pollInput() {
 		
 		List<String> commands = menuOverlay.pollInput();
 		for(String com: commands) {
@@ -110,7 +66,7 @@ public class ResultsScreen extends SetupScreen {
 				finished = true;
 				break;
 			case "play": 
-				frame.state = GameState.SETUP;
+				frame.state = GameState.OPTIONS;
 				finished = true;
 				break;
 			case "quit": 
@@ -123,7 +79,7 @@ public class ResultsScreen extends SetupScreen {
 	
 	@Override
 	public void cancel() {
-		frame.state = GameState.MAINMENU;
+		frame.state = GameState.END;
 		finished = true;		
 	}
 }
