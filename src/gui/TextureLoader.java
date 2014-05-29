@@ -98,11 +98,7 @@ public class TextureLoader {
 	private void countTextures() {
 		
 		File[] dirs = new File[] {
-				new File("images/"),
-				new File("images/powers_unlock/"),
-				new File("images/powers/"),
-				new File("images/icons/"),
-				new File("images/hud/")};
+				new File("images/")};
 		
 		for(File f: dirs) {
 			if(!f.exists() || !f.isDirectory())  {

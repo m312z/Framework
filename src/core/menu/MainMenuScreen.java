@@ -39,23 +39,23 @@ public class MainMenuScreen extends Screen {
 				new Point2D(-hs*2, hs/2)
 		});
 		
-		ButtonElement startButton = new ButtonElement("start_button", bs, new Point2D(SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2 - 3*hs), Color.BLACK, Pallete.dull, Color.WHITE);
+		ButtonElement startButton = new ButtonElement("start_button", bs, new Point2D(SCREEN_SIZE[0]/2, 3*hs), Color.BLACK, Pallete.dull, Color.WHITE);
 		startButton.addCommand(InteractionType.MOUSE_DOWN, "start");
 		startButton.addElement(new TextElement("sbt", bs, new Point2D(0,0), "PLAY", FontType.FONT_32));
 		
-		ButtonElement hostButton = new ButtonElement("host_button", bs, new Point2D(SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2 - 2*hs), Color.BLACK, Pallete.dull, Color.WHITE);
+		ButtonElement hostButton = new ButtonElement("host_button", bs, new Point2D(SCREEN_SIZE[0]/2, 4*hs), Color.BLACK, Pallete.dull, Color.WHITE);
 		hostButton.addCommand(InteractionType.MOUSE_DOWN, "host");
 		hostButton.addElement(new TextElement("hbt", bs, new Point2D(0,0), "HOST", FontType.FONT_32));
 		
-		ButtonElement joinButton = new ButtonElement("join_button", bs, new Point2D(SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2 - hs), Color.BLACK, Pallete.dull, Color.WHITE);
+		ButtonElement joinButton = new ButtonElement("join_button", bs, new Point2D(SCREEN_SIZE[0]/2, 5*hs), Color.BLACK, Pallete.dull, Color.WHITE);
 		joinButton.addCommand(InteractionType.MOUSE_DOWN, "join");
 		joinButton.addElement(new TextElement("jbt", bs, new Point2D(0,0), "JOIN", FontType.FONT_32));
 		
-		ButtonElement optionsButton = new ButtonElement("options_button", bs, new Point2D(SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2), Color.BLACK, Pallete.dull, Color.WHITE);
+		ButtonElement optionsButton = new ButtonElement("options_button", bs, new Point2D(SCREEN_SIZE[0]/2, 6*hs), Color.BLACK, Pallete.dull, Color.WHITE);
 		optionsButton.addCommand(InteractionType.MOUSE_DOWN, "options");
 		optionsButton.addElement(new TextElement("obt", bs, new Point2D(), "OPTIONS", FontType.FONT_32));
 		
-		ButtonElement quitButton = new ButtonElement("quit_button", bs, new Point2D(SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2 + hs), Color.BLACK, Pallete.dull, Color.WHITE);
+		ButtonElement quitButton = new ButtonElement("quit_button", bs, new Point2D(SCREEN_SIZE[0]/2, 7*hs), Color.BLACK, Pallete.dull, Color.WHITE);
 		quitButton.addCommand(InteractionType.MOUSE_DOWN, "quit");
 		quitButton.addElement(new TextElement("qbt", bs,new Point2D(), "QUIT", FontType.FONT_32));
 		

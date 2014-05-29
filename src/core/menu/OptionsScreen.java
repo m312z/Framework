@@ -43,21 +43,21 @@ public class OptionsScreen extends Screen {
 				new Point2D(-hs*2, hs/2)
 		});
 				
-		ButtonElement optionsButton = new ButtonElement("fullscreen_button", bs, new Point2D(SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2 - hs), Color.BLACK, Pallete.dull, Color.WHITE);
+		ButtonElement optionsButton = new ButtonElement("fullscreen_button", bs, new Point2D(SCREEN_SIZE[0]/2, 3*hs), Color.BLACK, Pallete.dull, Color.WHITE);
 		optionsButton.addCommand(InteractionType.MOUSE_DOWN, "fullscreen");
 		optionsButton.addElement(new TextElement("obt", bs, new Point2D(), "FULLSCREEN", FontType.FONT_32));
 		
-		ButtonElement soundButton = new ButtonElement("sound_button", bs, new Point2D(SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2), Color.BLACK, Pallete.dull, Color.WHITE);
+		ButtonElement soundButton = new ButtonElement("sound_button", bs, new Point2D(SCREEN_SIZE[0]/2, 4*hs), Color.BLACK, Pallete.dull, Color.WHITE);
 		soundButton.addCommand(InteractionType.MOUSE_DOWN, "sound");
 		soundButton.addElement(new TextElement("sbt_on", bs, new Point2D(), "SOUNDS ARE ON", FontType.FONT_32));
 		soundButton.addElement(new TextElement("sbt_off", bs, new Point2D(), "SOUNDS ARE OFF", FontType.FONT_32));
 		
-		ButtonElement musicButton = new ButtonElement("music_button", bs, new Point2D(SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2 + hs), Color.BLACK, Pallete.dull, Color.WHITE);
+		ButtonElement musicButton = new ButtonElement("music_button", bs, new Point2D(SCREEN_SIZE[0]/2, 5*hs), Color.BLACK, Pallete.dull, Color.WHITE);
 		musicButton.addCommand(InteractionType.MOUSE_DOWN, "music");
 		musicButton.addElement(new TextElement("mbt_on", bs, new Point2D(), "MUSIC IS OFF", FontType.FONT_32));
 		musicButton.addElement(new TextElement("mbt_off", bs, new Point2D(), "MUSIC IS ON", FontType.FONT_32));
 		
-		ButtonElement quitButton = new ButtonElement("quit_button", bs, new Point2D(SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2 + hs*2), Color.BLACK, Pallete.dull, Color.WHITE);
+		ButtonElement quitButton = new ButtonElement("quit_button", bs, new Point2D(SCREEN_SIZE[0]/2, 6*hs), Color.BLACK, Pallete.dull, Color.WHITE);
 		quitButton.addCommand(InteractionType.MOUSE_DOWN, "quit");
 		quitButton.addElement(new TextElement("qbt", bs,new Point2D(), "BACK", FontType.FONT_32));
 		
